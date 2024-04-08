@@ -1,0 +1,47 @@
+version: "3.8"
+
+name: "khangngn274-services"
+
+services:
+  #khai báo service mongodb
+  mongodb:
+    container_name: "container-mongodb"
+    image: "mongo"
+    volumes:
+      - data:/data/db
+    # enviroment:
+    #   MONGO_INITDB_ROOT_USERNAME: khangng274
+    #   MONGO_INITDB_ROOT_PASSWORD: 14764119
+    env_file:
+      - ./env/mongo.env
+  backend:
+    container_name: "container-backend"
+    build: ./backend
+    ports:
+      - "80:80"
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+  frontend:
+    container_name: "container-frontend"
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+
+volumes:
+  data:
+  logs:
